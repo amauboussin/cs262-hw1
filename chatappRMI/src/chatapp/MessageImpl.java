@@ -1,18 +1,17 @@
 package chatapp;
 
 import java.io.Serializable;
-import java.util.UUID;
 
 public class MessageImpl implements Message, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private UUID fromID;
-	private UUID toID;
+	private String fromID;
+	private String toID;
 	private String msgStr;
 	private Long msgTime;
 	
-	public MessageImpl(UUID fromUser, UUID toUser, String msgText, Long msgT) {
+	public MessageImpl(String fromUser, String toUser, String msgText, Long msgT) {
 		fromID = fromUser;
 		toID = toUser;
 		msgStr = msgText;
@@ -20,12 +19,12 @@ public class MessageImpl implements Message, Serializable {
 	}
 	
 	@Override
-	public UUID fromUser() {
+	public String fromUser() {
 		return fromID;
 	}
 	
 	@Override
-	public UUID toUser() {
+	public String toUser() {
 		return toID;
 	}
 	

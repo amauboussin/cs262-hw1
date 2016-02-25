@@ -3,7 +3,6 @@ package chatapp;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  *  An interface for chat application server that can create
@@ -12,25 +11,25 @@ import java.util.UUID;
 */ 
 public interface ChatServer extends Remote {
 
-	UUID createAccount()
+	Boolean createAccount(String loginID)
 			throws RemoteException;
 	
-	void deleteAccount(UUID userID)
+	void deleteAccount(String userID)
 			throws RemoteException;
 
-	Set<UUID> listAccounts()
+	Set<String> listAccounts()
 			throws RemoteException;
 	
-	UUID createGroup(Set<UUID> members)
+	String createGroup(Set<String> members, String groupID)
 			throws RemoteException;
 	
-	Set<UUID> listGroups()
+	Set<String> listGroups()
 			throws RemoteException;
 	
 	void sendMessage(Message msg)
 			throws RemoteException;
 	
-	Set<Message> deliverMessages(UUID toUser)
+	Set<Message> deliverMessages(String toUser)
 			throws RemoteException;
 	
 	String hostname()

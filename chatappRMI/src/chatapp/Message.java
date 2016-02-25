@@ -1,10 +1,9 @@
 package chatapp;
 
-import java.util.UUID;
 
 public interface Message {
-	UUID fromUser();
-	UUID toUser();
+	String fromUser();
+	String toUser();
 	String msgText();
 	Long msgTime();
 }

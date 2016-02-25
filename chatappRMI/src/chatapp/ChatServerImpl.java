@@ -7,20 +7,19 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
-import java.util.UUID;
 import java.util.HashSet;
 import java.util.Hashtable;
 
 public class ChatServerImpl implements ChatServer {
 	
-	private Set<UUID> userList = new HashSet<UUID>();
-	private Hashtable<UUID, Set<UUID>> groupTable = new Hashtable<UUID, Set<UUID>>();
-	private Hashtable<UUID, Set<Message>> msgQueues = new Hashtable<UUID, Set<Message>>();
+	private Set<String> userList = new HashSet<String>();
+	private Hashtable<String, Set<String>> groupTable = new Hashtable<String, Set<String>>();
+	private Hashtable<String, Set<Message>> msgQueues = new Hashtable<String, Set<Message>>();
 	private Registry registry;
 	private ChatServer myStub;
 	
-	/*public ChatServerImpl(Set<UUID> initUserList, Hashtable<UUID, Set<UUID>> initGroupTable,
-			Hashtable<UUID, Set<Message>> initMsgQueues){
+	/*public ChatServerImpl(Set<String> initUserList, Hashtable<String, Set<String>> initGroupTable,
+			Hashtable<String, Set<Message>> initMsgQueues){
 		userList = initUserList;
 		groupTable = initGroupTable;
 		msgQueues = initMsgQueues;*/
@@ -35,15 +34,17 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	@Override
-	public UUID createAccount() throws RemoteException {
-		UUID newID = UUID.randomUUID();
+	public Boolean createAccount(String newID) throws RemoteException {
+		if (userList.contains(newID)) {
+			return false;
+		}
 		userList.add(newID);
-		System.out.println("Added new account");
-		return(newID);
+		System.out.printf("Added new account %s.\n",newID);
+		return true;
 	}
 			
 	@Override
-	public void deleteAccount(UUID userID) throws RemoteException{
+	public void deleteAccount(String userID) throws RemoteException{
 		userList.remove(userID);
 		msgQueues.remove(userID);
 		// also remove from all groups?
@@ -51,33 +52,35 @@ public class ChatServerImpl implements ChatServer {
 
 	
 	@Override
-	public Set<UUID> listAccounts() throws RemoteException{
+	public Set<String> listAccounts() throws RemoteException{
 			return userList;
 	}
 	
 	@Override
-	public UUID createGroup(Set<UUID> members) throws RemoteException{
-		UUID groupID = UUID.randomUUID();
+	public String createGroup(Set<String> members, String groupID) throws RemoteException{
 		groupTable.put(groupID,members); // any point in checking that all members are in userList?
 		return groupID;
 	}
 	
 	@Override
-	public Set<UUID> listGroups() throws RemoteException{
+	public Set<String> listGroups() throws RemoteException{
 		return groupTable.keySet(); // do we also need to list members?
 	}
 	
 	
 	@Override
 	public void sendMessage(Message newMsg) throws RemoteException{
-		UUID toUser = newMsg.toUser();
+		String toUser = newMsg.toUser();
 		if (userList.contains(toUser)) {
-			Set<Message> Msgs = msgQueues.get(toUser);
+			Set<Message> Msgs = new HashSet<Message>();
+			if (msgQueues.containsKey(toUser)) { 
+				Msgs = msgQueues.get(toUser);
+			}
 			Msgs.add(newMsg);
-			msgQueues.put(toUser, Msgs);	
+			msgQueues.put(toUser, Msgs);
 		} else if (groupTable.containsKey(toUser)) {
-			Set<UUID> members = groupTable.get(toUser);
-			for (UUID m : members){
+			Set<String> members = groupTable.get(toUser);
+			for (String m : members){
 				if (userList.contains(m)) {
 					Set<Message> Msgs = msgQueues.get(m);
 					Msgs.add(newMsg);
@@ -90,7 +93,7 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	@Override
-	public Set<Message> deliverMessages(UUID toUser) throws RemoteException{
+	public Set<Message> deliverMessages(String toUser) throws RemoteException{
 		Set<Message> msgs = msgQueues.get(toUser);
 		msgQueues.remove(toUser);
 		return msgs;

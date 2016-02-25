@@ -4,28 +4,30 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.Date;
 
 public class ChatClientImpl implements ChatClient {
 	
 	private String serverHost;
-	private UUID myID;
+	private String myID;
 	private ChatServer server = null;
 	
-	public ChatClientImpl(String serverHostName, UUID loginID){
+	public ChatClientImpl(String serverHostName, String loginID){
 		serverHost = serverHostName;
 		myID = loginID;
 		server = getServer(serverHost);
 		System.out.println("Connected");
 	}
 	
-	public void createAccount() {
+	public void createAccount(String loginID) {
 		try{
 			if(server != null){
-				myID = server.createAccount();
-				System.out.printf("Signed in under new account %s.",myID.toString());
-				System.out.println();
+				if (server.createAccount(loginID)){
+					myID = loginID;
+					System.out.printf("Signed in under new account %s.\n",loginID);
+				} else {
+					System.out.printf("Account %s already used, please choose another ID.\n",loginID);
+				}
 			}
 		} catch (RemoteException e) {
 			System.out.println("Could not create account.");
@@ -49,9 +51,9 @@ public class ChatClientImpl implements ChatClient {
 	public void listAccounts() {
 		try{
 			if(server != null){
-				Set<UUID> accounts = server.listAccounts();
+				Set<String> accounts = server.listAccounts();
 				System.out.println("Current accounts:");
-				for (UUID a : accounts){
+				for (String a : accounts){
 					System.out.printf("%x",a);
 				}	
 			}
@@ -61,10 +63,10 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 
-	public void createGroup(Set<UUID> members){
+	public void createGroup(Set<String> members, String groupID){
 		try{
 			if(server != null){
-				UUID groupID = server.createGroup(members);
+				server.createGroup(members, groupID);
 				System.out.printf("Group %x created.",groupID);
 			}
 		} catch (RemoteException e) {
@@ -76,9 +78,9 @@ public class ChatClientImpl implements ChatClient {
 	public void listGroups() {
 		try{
 			if(server != null){
-				Set<UUID> groups = server.listGroups();
+				Set<String> groups = server.listGroups();
 				System.out.println("Current groups:");
-				for (UUID g : groups){
+				for (String g : groups){
 					System.out.printf("%x",g);
 				}	
 			}
@@ -88,7 +90,7 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 	
-	public void sendMessage(UUID toUser, String msgText){
+	public void sendMessage(String toUser, String msgText){
 		try{
 			if(server != null){
 				Message newMsg = new MessageImpl(myID,toUser,msgText,System.currentTimeMillis());
@@ -108,7 +110,7 @@ public class ChatClientImpl implements ChatClient {
 				Set<Message> msgs = server.deliverMessages(myID);
 				for (Message m : msgs){
 					Date mdate = new Date(m.msgTime());
-					System.out.printf("At " + mdate + ", user %x said:%n %s",m.fromUser(),m.msgText());
+					System.out.printf("At %s , user %s said: %s",mdate.toString(), m.fromUser(),m.msgText());
 				}
 			}
 		} catch (RemoteException e) {
