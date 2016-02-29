@@ -19,14 +19,13 @@ public class ChatClientImpl implements ChatClient {
 		System.out.println("Connected");
 	}
 	
-	public void createAccount(String loginID) {
+	public void createAccount() {
 		try{
 			if(server != null){
-				if (server.createAccount(loginID)){
-					myID = loginID;
-					System.out.printf("Signed in under new account %s.\n",loginID);
+				if (server.createAccount(myID)){
+					System.out.printf("Created new account %s.\n",myID);
 				} else {
-					System.out.printf("Account %s already used, please choose another ID.\n",loginID);
+					System.out.printf("Account %s already exists.\n",myID);
 				}
 			}
 		} catch (RemoteException e) {
@@ -40,7 +39,7 @@ public class ChatClientImpl implements ChatClient {
 		try{
 			if(server != null){
 				server.deleteAccount(myID);
-				System.out.printf("Account %x deleted.",myID);
+				System.out.printf("Account %s deleted. \n",myID);
 			}
 		} catch (RemoteException e) {
 			System.out.println("Could not delete account.");
@@ -48,13 +47,19 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 
-	public void listAccounts() {
+	public void listAccounts(String regexp) {
 		try{
+			String toMatch = regexp;
+			if (toMatch.equals("")) {
+				toMatch = "(.*)";
+			}
 			if(server != null){
-				Set<String> accounts = server.listAccounts();
-				System.out.println("Current accounts:");
+				Set<String> accounts = server.getAccounts();
+				System.out.printf("Accounts matching input %s: \n", regexp);
 				for (String a : accounts){
-					System.out.printf("%x",a);
+					if (a.matches(toMatch)) {
+						System.out.printf("%s \n",a);
+					}
 				}	
 			}
 		} catch (RemoteException e) {
@@ -67,7 +72,7 @@ public class ChatClientImpl implements ChatClient {
 		try{
 			if(server != null){
 				server.createGroup(members, groupID);
-				System.out.printf("Group %x created.",groupID);
+				System.out.printf("Group %s created. \n",groupID);
 			}
 		} catch (RemoteException e) {
 			System.out.println("Could not create group.");
@@ -75,17 +80,23 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 	
-	public void listGroups() {
+	public void listGroups(String regexp) {
 		try{
+			String toMatch = regexp;
+			if (toMatch.equals("")) {
+				toMatch = "(.*)";
+			}
 			if(server != null){
-				Set<String> groups = server.listGroups();
-				System.out.println("Current groups:");
+				Set<String> groups = server.getGroups();
+				System.out.printf("Accounts matching input %s: \n", regexp);
 				for (String g : groups){
-					System.out.printf("%x",g);
+					if (g.matches(toMatch)) {
+						System.out.printf("%s \n",g);
+					}
 				}	
 			}
 		} catch (RemoteException e) {
-			System.out.println("Could not list groups.");
+			System.out.println("Could not list accounts.");
 			e.printStackTrace();
 		}
 	}
@@ -98,7 +109,7 @@ public class ChatClientImpl implements ChatClient {
 				System.out.println("Message sent.");
 			}
 		} catch (RemoteException e) {
-			System.out.printf("Could not send message \"%s\" to user %x.",msgText,toUser);
+			System.out.printf("Could not send message \"%s\" to user %s. \n",msgText,toUser);
 			e.printStackTrace();
 		}
 	}
@@ -110,7 +121,7 @@ public class ChatClientImpl implements ChatClient {
 				Set<Message> msgs = server.deliverMessages(myID);
 				for (Message m : msgs){
 					Date mdate = new Date(m.msgTime());
-					System.out.printf("At %s , user %s said: %s",mdate.toString(), m.fromUser(),m.msgText());
+					System.out.printf("At %s , user %s said: %s \n",mdate.toString(), m.fromUser(),m.msgText());
 				}
 			}
 		} catch (RemoteException e) {

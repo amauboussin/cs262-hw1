@@ -52,8 +52,8 @@ public class ChatServerImpl implements ChatServer {
 
 	
 	@Override
-	public Set<String> listAccounts() throws RemoteException{
-			return userList;
+	public Set<String> getAccounts() throws RemoteException{
+		return userList;
 	}
 	
 	@Override
@@ -63,7 +63,7 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	@Override
-	public Set<String> listGroups() throws RemoteException{
+	public Set<String> getGroups() throws RemoteException{
 		return groupTable.keySet(); // do we also need to list members?
 	}
 	
@@ -72,12 +72,16 @@ public class ChatServerImpl implements ChatServer {
 	public void sendMessage(Message newMsg) throws RemoteException{
 		String toUser = newMsg.toUser();
 		if (userList.contains(toUser)) {
-			Set<Message> Msgs = new HashSet<Message>();
-			if (msgQueues.containsKey(toUser)) { 
-				Msgs = msgQueues.get(toUser);
+			if (userList.contains(newMsg.fromUser())) {
+				Set<Message> Msgs = new HashSet<Message>();
+				if (msgQueues.containsKey(toUser)) { 
+					Msgs = msgQueues.get(toUser);
+				}
+				Msgs.add(newMsg);
+				msgQueues.put(toUser, Msgs);
+			} else {
+				System.out.println("Please create an account before sending a message.");
 			}
-			Msgs.add(newMsg);
-			msgQueues.put(toUser, Msgs);
 		} else if (groupTable.containsKey(toUser)) {
 			Set<String> members = groupTable.get(toUser);
 			for (String m : members){
@@ -85,10 +89,10 @@ public class ChatServerImpl implements ChatServer {
 					Set<Message> Msgs = msgQueues.get(m);
 					Msgs.add(newMsg);
 					msgQueues.put(m, Msgs);
-				} // else, we don't really care?
+				} 
 			}
 		} else {
-			// exception: user *** not found
+			System.out.printf("No account with user name %s. \n", toUser);
 		}
 	}
 	

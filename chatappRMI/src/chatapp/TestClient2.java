@@ -8,8 +8,8 @@ public class TestClient2 {
 		if (args.length > 0) {
 			hostname = args[0];
 		}
-		ChatClient client = new ChatClientImpl(hostname, "");	
-		client.createAccount("Client2");
+		ChatClient client = new ChatClientImpl(hostname, "Client2");	
+		client.createAccount();
 		try {
 			TimeUnit.SECONDS.sleep(3);
 		} catch (InterruptedException e) {
