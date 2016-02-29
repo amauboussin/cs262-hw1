@@ -88,13 +88,15 @@ def list_accounts(query):
     return ', '.join(account_names)
 
 
-def delete_account(to_delete):
-    if to_delete in accounts:
+def delete_account(requester, to_delete):
+    if to_delete in socket_username.values():
+        return 'Account %s is currently logged in' % to_delete
+    elif to_delete in accounts:
         accounts.remove(to_delete)
         queued_messages.pop(to_delete)
-        return 'Account %s was deleted.'
+        return 'Account %s was deleted.' % to_delete
     else:
-        return 'Account %s does not exist.'
+        return 'Account %s does not exist.' % to_delete
 
 
 def send(socket, message):
@@ -135,7 +137,7 @@ def parse_client_message(requester, message):
         except TypeError as e:
             response = str(e) 
     else:
-        response = 'Command %s does not exist' % command
+        response = 'Command %s does not exist.' % command
     
     if response:
         send(requester, response)

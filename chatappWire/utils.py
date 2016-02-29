@@ -48,7 +48,7 @@ def serialize_request(command):
     args = pieces[1] if len(pieces) > 1 else None  
     
     if comm_string not in commands:
-        print 'Invalid command %s' % comm_string
+        print 'Invalid command %s. Type "help" to see options.' % comm_string
         return None, None
     
     if comm_string in ('message', 'message_group'):
