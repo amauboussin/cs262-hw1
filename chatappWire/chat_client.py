@@ -2,7 +2,7 @@ import socket
 import select
 import sys
 import string
-
+from utils import *
 
 
 if __name__ == "__main__":
@@ -36,7 +36,11 @@ if __name__ == "__main__":
         
         for s in reads:
             if s == sock:
-                header == sock.recv(16).split("|")
-                if (header[0] != version)
+                header = sock.recv(16)
+                ver, payload_size = parse_header(header)
+                body = sock.recv(payload_size)
+                if (ver != version):
+                    print 'Bad version'
+            
                 
 
