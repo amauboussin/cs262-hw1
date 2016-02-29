@@ -1,7 +1,6 @@
 import socket
 import select
 
-from constants import *
 from utils import *
 
 all_sockets = []
@@ -10,86 +9,96 @@ groups = {}
 socket_username = {}
 queued_messages = {}
 
-commands = {
-    'create_account': create_account,
-    'create_group': create_group,
-    'message_user': message_user,
-    'message_group': message_group,
-    'list_groups': list_groups,
-    'list_accounts': list_accounts,
-    'delete_account': delete_account,
-}
 
 def log(message):
     print message
 
-def login(socket, username):
-    socket_username[str(socket)] = username
+def login(requester, username):
+    if username not in accounts:
+        accounts.add(username)
+    socket_username[str(requester)] = username
     if len(queued_messages[username]):
         for message in queued_messages[username]:
             message_user(username, message)
+    return 'Logged in as %s' % username
 
 
-def create_account(socket, name):
+def create_account(requester, name):
     '''Create an account with the given name and login'''
     if not name in accounts:
         accounts.add(name)
-        login(socket, name)
-        return True
-    return False
+        queued_messages[name] = []
+        return 'Created account %s' % name
+    return 'Account %s already exists' % name
 
 
-def create_group(name, members):
+def create_group(requester, name, *members):
+    return_message = ''
     if not name in groups:
-        groups[name] = members
+        groups[name] = []
+        for member in members:
+            if member in accounts:
+                groups[name].append(member)
+            else:
+                return_message += 'Account %s does not exist\n' % member
+        return return_message + 'Group %s created' % name
+    else:
+        return 'Group %s already exists' % name
 
-def message_user(user, message):
+def message_user(requester, user, message):
+    from_user = socket_username[requester]
+    message = '%s: %s' % from_user, message
     username_socket = {v: k for k, v in socket_username.items()}
     if user in username_socket:
         send(username_socket[user], message)
     elif user in queued_messages:
         queued_messages.append(message)
+        return 'User %s is offline, message queued' % user
     else:
-        pass
+        return 'User %s does not exist' % user
 
 
-def message_group(group, message):
+def message_group(requester, group, message):
     if group in groups:
         for user in groups[group]:
             message_user(user, message)
     else:
-        pass
+       return 'Group %s does not exist\n' % group
 
 
-def get_ranking(query, name):
+def _ranking(query, name):
     '''Get key to rank by first occurence of the query'''
     first_occurence = name.find(query)
     if first_occurence == -1:
         first_occurence = len(name)
     return first_occurence
 
-def list_groups(query, recipient_socket):
-    group_names = sorted(groups.keys(), key=ranking)
-    send(recipient, ', '.join(group_names))
+def list_groups(query):
+    group_names = sorted(groups.keys())
+    return ', '.join(group_names)
 
 
-def list_accounts(query, recipient):
-    account_names = sorted(list(accounts), key=ranking)
-    send(recipient, ', '.join(account_names))
+def list_accounts(query):
+    account_names = sorted(list(accounts))
+    return ', '.join(account_names)
 
 
-def delete_account(to_delete, recipient):
+def delete_account(to_delete):
     if to_delete in accounts:
         accounts.remove(to_delete)
         queued_messages.pop(to_delete)
-        send(recipient, 'Account %s was deleted.')
+        return 'Account %s was deleted.'
     else:
-        send(recipient, 'Account %s does not exist.')
+        return 'Account %s does not exist.'
 
 
 def send(socket, message):
     '''Send the given message to the given recipient'''
+    if not len(message):
+        log('Tried to send blank message')
+    header = serialize_header(len(message))
     try:
+        socket.send(header)
         socket.send(message)
     except socket.error:
         handle_disconnect(socket)
@@ -101,6 +110,29 @@ def handle_disconnect(socket):
     all_sockets.remove(socket)
     socket_username.pop(socket)
 
+
+def get_command(command):
+    if command in globals():
+        return globals()[command]
+    else:
+        raise Exception('Command %s does not exist' % command)
+
+commands = {c: get_command(c) for c in commands}
+
+def parse_client_message(requester, message):
+    '''Parse a request from a client and return a response'''
+    command, args = parse_body(message)
+    print command, args
+    if command in commands:
+        try:
+            response = commands[command](requester, *args)
+            print response
+        except TypeError as e:
+            response = str(e) 
+    else:
+        response = 'Command %s does not exist' % command
+    
+    send(requester, response)
 
 def main():
     
@@ -125,10 +157,12 @@ def main():
             #  data from another socket is a message
             else:
                 try:
-                    version, payload_size = parse_header(sock.recv(HEADER_SIZE))
-                    received_message = s.recv(payload_size)
-                    if received_message:
-                        parse_message(s, received_message)
+                    data = s.recv(HEADER_SIZE)
+                    if data:
+                        version, payload_size = parse_header(data)
+                        received_message = s.recv(payload_size)
+                        if received_message:
+                            parse_client_message(s, received_message)
                 except socket.error:
                     handle_disconnect(s)
 
