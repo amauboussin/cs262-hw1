@@ -13,6 +13,11 @@ public class TestClient2 {
 		client.createAccount();
 		client.login();
 		client.sendMessage("Client1", "Hi");
+		try {
+			TimeUnit.SECONDS.sleep(20);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		client.logout();
 	}	
-}
+} 

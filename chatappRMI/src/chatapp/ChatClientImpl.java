@@ -9,7 +9,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
 import java.util.Date;
 
-public class ChatClientImpl implements ChatClient, Serializable {
+public class ChatClientImpl implements ChatClient {
 	
 	/**
 	 * 

@@ -19,13 +19,13 @@ public class TestClient {
 		client.listAccounts("");
 		client.listAccounts("Cl.*");
 		client.createGroup(new HashSet<String>(Arrays.asList("Client1")), "Group1");
-		client.listGroups("");
+		client.listGroups("");*/
 		try {
-			TimeUnit.SECONDS.sleep(3);
+			TimeUnit.SECONDS.sleep(10);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		client.sendMessage("Client2", "Hi");*/
+		client.sendMessage("Client2", "Hi");
 		try {
 			TimeUnit.SECONDS.sleep(20);
 		} catch (InterruptedException e) {
