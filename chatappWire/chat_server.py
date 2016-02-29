@@ -2,12 +2,18 @@ import socket
 import select
 
 from constants import *
+from utils import *
 
 all_sockets = []
 accounts = set()
 groups = {}
 socket_username = {}
 
+
+commands = {
+    'create_account': create_account,
+    'create_group': create_group,
+}
 
 def log(message):
     print message
@@ -41,14 +47,6 @@ def handle_disconnect(socket):
     all_sockets.remove(socket)
     socket_username.pop(socket)
 
-
-def parse_message(from_socket, message):
-    pass
-
-def parse_header(header):
-    version, payload_size = header.split('|')
-    payload_size = int(payload_size)
-    return version, payload_size
 
 def main():
     
