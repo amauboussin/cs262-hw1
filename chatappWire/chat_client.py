@@ -3,7 +3,10 @@ import socket
 import select
 import sys
 import string
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8fd3651b4dcbf3696d90a98c81141089cd90fd25
 from utils import *
 
 def send_to_server(client_socket, command):
@@ -77,5 +80,6 @@ if __name__ == "__main__":
                 else:
                     send_to_server(client_socket, message)
                 prompt()
+
                 
 
