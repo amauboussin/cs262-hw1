@@ -13,6 +13,7 @@ queued_messages = {}
 def log(message):
     print message
 
+
 def login(requester, username):
     if username not in accounts:
         return 'Account %s does not exist' % username
@@ -23,8 +24,10 @@ def login(requester, username):
         queued_messages[username] = [] #  reset queue
     return response
 
+
 def logout(requester):
     handle_disconnect(requester)
+
 
 def create_account(requester, name):
     '''Create an account with the given name and login'''
@@ -47,6 +50,7 @@ def create_group(requester, name, *members):
         return return_message + 'Group %s created' % name
     else:
         return 'Group %s already exists' % name
+
 
 def message(requester, user, message, from_queue=False):
     from_user = socket_username[requester]

@@ -43,6 +43,10 @@ def serialize_header(payload_size):
     return header + '0' * padding_length
 
 def serialize_request(command):
+    if command.find('|') != -1:
+        print 'Illegal character |'
+        return None, None
+
     pieces = command.split(' ', 1)
     comm_string = pieces[0].strip()
     args = pieces[1] if len(pieces) > 1 else None  
@@ -52,11 +56,11 @@ def serialize_request(command):
         return None, None
     
     if comm_string in ('message', 'message_group'):
-        recipient, message = args.split(' ', 1);
-
-        if (message.find('|') != -1):
-            print 'Illegal message character |'
+        if not ' ' in args:
+            print 'Not enough arguments'
             return None, None
+
+        recipient, message = args.split(' ', 1)
 
         body = comm_string + '|' + recipient + '|' + message
         header = serialize_header(len(body))
@@ -74,8 +78,8 @@ def serialize_request(command):
 def run_tests():
     test_serialize_request()
 
-def test_serialize():
-    print serialize_request('message_user andrew hi') 
+def test_serialize_request():
+    print serialize_request('message andrew hi') 
     print serialize_request('create_group my_group andrew alex eric emma dennis') 
 
 if __name__ == '__main__':
