@@ -8,19 +8,26 @@ def login(socket, username):
 
 
 def create_account(socket, name):
-	'''Create an account with the given name and login'''
-	if not name in accounts:
-		accounts.add(name)
-		login(socket, name)
-		return True
-	return False
+    '''Create an account with the given name and login'''
+    if not name in accounts:
+        accounts.add(name)
+        login(socket, name)
+        return True
+    return False
 
 
-def broadcast_data(socket, message):
-	'''Send the given message to the given recipient'''
-    try :
-        socket.send(message)
-    except :
-        # broken socket connection may be, chat client pressed ctrl+c for example
-        socket.close()
-        CONNECTION_LIST.remove(socket)
+def send(socket, message):
+    '''Send the given message to the given recipient'''
+    socket.send(message)
+    # try :
+    #     socket.send(message)
+    # except :
+    #     socket.close()
+    #     CONNECTION_LIST.remove(socket)
+
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
