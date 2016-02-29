@@ -63,10 +63,10 @@ def message(requester, user, message, from_queue=False):
         return 'User %s does not exist' % user
 
 
-def message_group(requester, group, message):
+def message_group(requester, group, to_send):
     if group in groups:
         for user in groups[group]:
-            message(user, message)
+            message(requester, user, to_send)
     else:
        return 'Group %s does not exist\n' % group
 
