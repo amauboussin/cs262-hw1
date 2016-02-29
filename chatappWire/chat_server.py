@@ -1,12 +1,16 @@
+import socket
+import select
 
-PORT = 5000
-RECV_BUFFER = 4096
-MAX_CLIENTS = 10
+from constants import *
 
 all_sockets = []
-accounts = set{}
+accounts = set()
+groups = {}
 socket_username = {}
 
+
+def log(message):
+    print message
 
 def login(socket, username):
     socket_username[str(socket)] = username
@@ -20,6 +24,9 @@ def create_account(socket, name):
         return True
     return False
 
+def create_group(name, members):
+    if not name in groups:
+        groups[name] = members
 
 def send(socket, message):
     '''Send the given message to the given recipient'''
@@ -38,6 +45,11 @@ def handle_disconnect(socket):
 def parse_message(from_socket, message):
     pass
 
+def parse_header(header):
+    version, payload_size = header.split('|')
+    payload_size = int(payload_size)
+    return version, payload_size
+
 def main():
     
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -46,6 +58,8 @@ def main():
     server_socket.listen(MAX_CLIENTS)
  
     all_sockets.append(server_socket)
+
+    log('Server started on port %s' % PORT)
 
     while True:
         # Get a list of sockets that send data. does not work on winodws
@@ -59,7 +73,8 @@ def main():
             #  data from another socket is a message
             else:
                 try:
-                    received_message = s.recv(RECV_BUFFER)
+                    version, payload_size = parse_header(sock.recv(HEADER_SIZE))
+                    received_message = s.recv(payload_size)
                     if received_message:
                         parse_message(s, received_message)
                 except socket.error:
