@@ -17,13 +17,19 @@ public interface ChatServer extends Remote {
 	void deleteAccount(String userID)
 			throws RemoteException;
 
+    void login(ChatClient client) 
+    		throws RemoteException;
+
+    void logout(ChatClient client) 
+    		throws RemoteException;	
+	
 	Set<String> getAccounts()
 			throws RemoteException;
 	
 	String createGroup(Set<String> members, String groupID)
 			throws RemoteException;
 	
-	Set<String> getGroups()
+ 	Set<String> getGroups()
 			throws RemoteException;
 	
 	void sendMessage(Message msg)

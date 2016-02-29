@@ -17,6 +17,8 @@ public class ChatServerImpl implements ChatServer {
 	private Hashtable<String, Set<Message>> msgQueues = new Hashtable<String, Set<Message>>();
 	private Registry registry;
 	private ChatServer myStub;
+	// to send a message to a logged in client
+	private Hashtable<String, ChatClient> loggedInClients = new Hashtable<String, ChatClient>();
 	
 	/*public ChatServerImpl(Set<String> initUserList, Hashtable<String, Set<String>> initGroupTable,
 			Hashtable<String, Set<Message>> initMsgQueues){
@@ -49,7 +51,18 @@ public class ChatServerImpl implements ChatServer {
 		msgQueues.remove(userID);
 		// also remove from all groups?
 	}
-
+	
+	@Override
+    public void login(ChatClient client) throws RemoteException {
+		loggedInClients.put(client.getID(), client);
+	}
+	
+	@Override
+    public void logout(ChatClient client) throws RemoteException {
+		if (loggedInClients.containsKey(client.getID())) {
+			loggedInClients.remove(client.getID());
+		}
+	}
 	
 	@Override
 	public Set<String> getAccounts() throws RemoteException{
@@ -62,9 +75,15 @@ public class ChatServerImpl implements ChatServer {
 		return groupID;
 	}
 	
-	@Override
+ 	@Override
 	public Set<String> getGroups() throws RemoteException{
-		return groupTable.keySet(); // do we also need to list members?
+ 		Set<String> groupList = new HashSet<String>();
+ 		//  .keySet is backed up by the hash table so 
+ 		//  we cannot marshall it
+ 		for (String g: groupTable.keySet()) {
+ 			groupList.add(g);
+ 		}
+		return groupList; 
 	}
 	
 	
@@ -73,12 +92,16 @@ public class ChatServerImpl implements ChatServer {
 		String toUser = newMsg.toUser();
 		if (userList.contains(toUser)) {
 			if (userList.contains(newMsg.fromUser())) {
-				Set<Message> Msgs = new HashSet<Message>();
-				if (msgQueues.containsKey(toUser)) { 
-					Msgs = msgQueues.get(toUser);
+				if (loggedInClients.containsKey(toUser)) {
+					loggedInClients.get(toUser).deliverMessage(newMsg);
+				} else {
+					Set<Message> Msgs = new HashSet<Message>();
+					if (msgQueues.containsKey(toUser)) { 
+						Msgs = msgQueues.get(toUser);
+					}
+					Msgs.add(newMsg);
+					msgQueues.put(toUser, Msgs);
 				}
-				Msgs.add(newMsg);
-				msgQueues.put(toUser, Msgs);
 			} else {
 				System.out.println("Please create an account before sending a message.");
 			}
