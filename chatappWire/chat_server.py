@@ -8,7 +8,7 @@ all_sockets = []
 accounts = set()
 groups = {}
 socket_username = {}
-
+queued_messages = {}
 
 commands = {
     'create_account': create_account,
@@ -25,6 +25,9 @@ def log(message):
 
 def login(socket, username):
     socket_username[str(socket)] = username
+    if len(queued_messages[username]):
+        for message in queued_messages[username]:
+            message_user(username, message)
 
 
 def create_account(socket, name):
@@ -41,19 +44,47 @@ def create_group(name, members):
         groups[name] = members
 
 def message_user(user, message):
-    pass
+    username_socket = {v: k for k, v in socket_username.items()}
+    if user in username_socket:
+        send(username_socket[user], message)
+    elif user in queued_messages:
+        queued_messages.append(message)
+    else:
+        pass
+
 
 def message_group(group, message):
-    pass
+    if group in groups:
+        for user in groups[group]:
+            message_user(user, message)
+    else:
+        pass
 
-def list_groups(query, recipient):
-    pass
+
+def get_ranking(query, name):
+    '''Get key to rank by first occurence of the query'''
+    first_occurence = name.find(query)
+    if first_occurence == -1:
+        first_occurence = len(name)
+    return first_occurence
+
+def list_groups(query, recipient_socket):
+    group_names = sorted(groups.keys(), key=ranking)
+    send(recipient, ', '.join(group_names))
+
 
 def list_accounts(query, recipient):
-    pass
+    account_names = sorted(list(accounts), key=ranking)
+    send(recipient, ', '.join(account_names))
+
 
 def delete_account(to_delete, recipient):
-    pass
+    if to_delete in accounts:
+        accounts.remove(to_delete)
+        queued_messages.pop(to_delete)
+        send(recipient, 'Account %s was deleted.')
+    else:
+        send(recipient, 'Account %s does not exist.')
 
 
 def send(socket, message):
