@@ -1,3 +1,4 @@
+import atexit
 import socket
 import select
 import sys
@@ -21,6 +22,8 @@ def prompt():
     sys.stdout.flush()
 
 if __name__ == "__main__":
+
+
     
     if (len(sys.argv) < 4):
         print 'Incorrect syntax: python chat_client.py hostname port username'
@@ -41,9 +44,12 @@ if __name__ == "__main__":
 
     send_to_server(client_socket, 'create_account %s' % username)
     send_to_server(client_socket, 'login %s' % username)
-    print 'Welcome ' + username + '.  Type -h for help.'
+    print 'Welcome ' + username + '.  Type "help" for help.'
 
-
+    @atexit.register
+    def logout():
+        send_to_server(client_socket, 'logout')
+    
     while True:
 
         sock_list = [sys.stdin, client_socket]
@@ -59,7 +65,6 @@ if __name__ == "__main__":
                         raise Exception('Client version %s does not match server version %s' % (VERSION, server_version))
                     received_message = s.recv(payload_size)
                     print received_message
-                    print 
                     prompt()
                 else:
                     print 'Server disconnected'
@@ -67,7 +72,10 @@ if __name__ == "__main__":
 
             else: #  data from stdin
                 message = sys.stdin.readline()
-                send_to_server(client_socket, message)
+                if message.startswith('help'):
+                    print get_help()
+                else:
+                    send_to_server(client_socket, message)
                 prompt()
                 
 

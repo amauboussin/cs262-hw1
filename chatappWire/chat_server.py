@@ -15,13 +15,16 @@ def log(message):
 
 def login(requester, username):
     if username not in accounts:
-        accounts.add(username)
-    socket_username[str(requester)] = username
+        return 'Account %s does not exist' % username
+    socket_username[requester] = username
+    response = 'Logged in as %s' % username
     if len(queued_messages[username]):
-        for message in queued_messages[username]:
-            message_user(username, message)
-    return 'Logged in as %s' % username
+        response += '\n' + '\n'.join(queued_messages[username])
+        queued_messages[username] = [] #  reset queue
+    return response
 
+def logout(requester):
+    handle_disconnect(requester)
 
 def create_account(requester, name):
     '''Create an account with the given name and login'''
@@ -45,14 +48,16 @@ def create_group(requester, name, *members):
     else:
         return 'Group %s already exists' % name
 
-def message_user(requester, user, message):
+def message(requester, user, message, from_queue=False):
     from_user = socket_username[requester]
-    message = '%s: %s' % from_user, message
+    if not from_queue:
+        message = '%s: %s' % (from_user, message)
     username_socket = {v: k for k, v in socket_username.items()}
     if user in username_socket:
         send(username_socket[user], message)
+        return 'Message sent'
     elif user in queued_messages:
-        queued_messages.append(message)
+        queued_messages[user].append(message)
         return 'User %s is offline, message queued' % user
     else:
         return 'User %s does not exist' % user
@@ -61,7 +66,7 @@ def message_user(requester, user, message):
 def message_group(requester, group, message):
     if group in groups:
         for user in groups[group]:
-            message_user(user, message)
+            message(user, message)
     else:
        return 'Group %s does not exist\n' % group
 
@@ -106,9 +111,11 @@ def send(socket, message):
 
 def handle_disconnect(socket):
     '''Logs out the user associated with the given socket'''
-    socket.close()
     all_sockets.remove(socket)
+    disconnected_user = socket_username[socket]
+    log(disconnected_user)
     socket_username.pop(socket)
+    socket.close()
 
 
 def get_command(command):
@@ -122,17 +129,16 @@ commands = {c: get_command(c) for c in commands}
 def parse_client_message(requester, message):
     '''Parse a request from a client and return a response'''
     command, args = parse_body(message)
-    print command, args
     if command in commands:
         try:
             response = commands[command](requester, *args)
-            print response
         except TypeError as e:
             response = str(e) 
     else:
         response = 'Command %s does not exist' % command
     
-    send(requester, response)
+    if response:
+        send(requester, response)
 
 def main():
     

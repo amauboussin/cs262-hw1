@@ -5,31 +5,28 @@ HEADER_SIZE = 16
 MAX_CLIENTS = 10
 
 
-commands = [
-    'login',
-    'create_account',
-    'create_group',
-    'message_user',
-    'message_group',
-    'list_groups',
-    'list_accounts',
-    'delete_account',
-]
-
 help = {
     'login': 'username',
+    'logout': 'No Arguments',
     'create_account': 'username',
     'create_group': 'group_name',
-    'message_user': 'username message',
+    'message': 'username message',
     'message_group': 'group_name message',
     'list_groups': 'query(optional)',
     'list_accounts': 'query(optional)',
     'delete_account': 'username',
 }
 
+commands = help.keys()
+
+def get_help():
+    s = 'Function: Arguments\n'
+    for f, args in help.items():
+        s += '%s: %s\n' % (f, args)
+    return s
 
 def parse_body(message):
-    pieces = message.split('|')
+    pieces = map(lambda s:s.strip(), message.split('|'))
     command = pieces[0].strip()
     args = pieces[1:] if len(pieces) > 1 else ()
     return command, args
@@ -54,7 +51,7 @@ def serialize_request(command):
         print 'Invalid command %s' % comm_string
         return None, None
     
-    if comm_string in ('message_user', 'message_group'):
+    if comm_string in ('message', 'message_group'):
         recipient, message = args.split(' ', 1);
 
         if (message.find('|') != -1):
