@@ -13,6 +13,11 @@ socket_username = {}
 commands = {
     'create_account': create_account,
     'create_group': create_group,
+    'message_user': message_user,
+    'message_group': message_group,
+    'list_groups': list_groups,
+    'list_accounts': list_accounts,
+    'delete_account': delete_account,
 }
 
 def log(message):
@@ -30,9 +35,26 @@ def create_account(socket, name):
         return True
     return False
 
+
 def create_group(name, members):
     if not name in groups:
         groups[name] = members
+
+def message_user(user, message):
+    pass
+
+def message_group(group, message):
+    pass
+
+def list_groups(query, recipient):
+    pass
+
+def list_accounts(query, recipient):
+    pass
+
+def delete_account(to_delete, recipient):
+    pass
+
 
 def send(socket, message):
     '''Send the given message to the given recipient'''
@@ -40,6 +62,7 @@ def send(socket, message):
         socket.send(message)
     except socket.error:
         handle_disconnect(socket)
+
 
 def handle_disconnect(socket):
     '''Logs out the user associated with the given socket'''
@@ -77,9 +100,6 @@ def main():
                         parse_message(s, received_message)
                 except socket.error:
                     handle_disconnect(s)
-
-
-
 
 if __name__ == '__main__':
     main()
