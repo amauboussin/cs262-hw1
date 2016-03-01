@@ -1,5 +1,6 @@
 import socket
 import select
+import re
 
 from utils import *
 
@@ -75,20 +76,19 @@ def message_group(requester, group, to_send):
        return 'Group %s does not exist\n' % group
 
 
-def _ranking(query, name):
-    '''Get key to rank by first occurence of the query'''
-    first_occurence = name.find(query)
-    if first_occurence == -1:
-        first_occurence = len(name)
-    return first_occurence
+def _filter_names(names, query):
+    '''Filter by the given wildcard query'''
+    check_match = lambda n: re.match(query.replace('*', '.*'), n)
+    return sorted(filter(check_match, names))
 
-def list_groups(query):
-    group_names = sorted(groups.keys())
+
+def list_groups(requester, query='*'):
+    group_names = _filter_names(groups.keys(), query)
     return ', '.join(group_names)
 
 
-def list_accounts(query):
-    account_names = sorted(list(accounts))
+def list_accounts(requester, query='*'):
+    account_names = _filter_names(list(accounts), query)
     return ', '.join(account_names)
 
 
