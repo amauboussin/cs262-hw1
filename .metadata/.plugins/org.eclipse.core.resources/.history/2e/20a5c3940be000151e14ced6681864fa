@@ -24,27 +24,16 @@ public interface ChatServer extends Remote {
     void logout(String clientID) 
     		throws RemoteException;	
 	
-<<<<<<< HEAD
 	Set<String> getAccounts(String regexp)
-=======
-	Set<String> getAccounts()
->>>>>>> RMI
 			throws RemoteException;
 	
 	void createGroup(Set<String> members, String groupID)
 			throws RemoteException;
 	
-<<<<<<< HEAD
-	Hashtable<String, Set<String>> getGroups(String regexp)
-			throws RemoteException;
-	
-	String sendMessage(Message msg)
-=======
 	Hashtable<String, Set<String>> getGroups()
 			throws RemoteException;
 	
 	void sendMessage(Message msg)
->>>>>>> RMI
 			throws RemoteException;
 	
 	Set<Message> deliverMessages(String toUser)

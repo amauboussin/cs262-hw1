@@ -3,7 +3,7 @@ package chatapp;
 import java.rmi.RemoteException;
 
 public class TestServer {
-	private static int port = 1358;
+	private static int port = 3550;
 	public static void main(String[] args) {
 		try{
 			ChatServer myserver = new ChatServerImpl(port);

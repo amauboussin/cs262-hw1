@@ -65,6 +65,7 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	@Override
+<<<<<<< HEAD
 	public Set<String> getAccounts(String regexp) throws RemoteException{
 		String toMatch = regexp;
 		if (toMatch.equals("")) {
@@ -77,6 +78,10 @@ public class ChatServerImpl implements ChatServer {
 			}
 		}	
 		return accounts;
+=======
+	public Set<String> getAccounts() throws RemoteException{
+		return userList;
+>>>>>>> RMI
 	}
 	
 	@Override
@@ -85,6 +90,7 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
  	@Override
+<<<<<<< HEAD
 	public Hashtable<String, Set<String>> getGroups(String regexp) throws RemoteException{
  		String toMatch = regexp;
 		if (toMatch.equals("")) {
@@ -97,10 +103,15 @@ public class ChatServerImpl implements ChatServer {
 				}
 			}	
  		return groups; 
+=======
+	public Hashtable<String, Set<String>> getGroups() throws RemoteException{
+ 		return groupTable; 
+>>>>>>> RMI
 	}
 	
 	
 	@Override
+<<<<<<< HEAD
 	public String sendMessage(Message newMsg) throws RemoteException{
 		if (! userList.contains(newMsg.fromUser())) {
 			System.out.println("Please create an account before sending a message.");
@@ -109,6 +120,12 @@ public class ChatServerImpl implements ChatServer {
 		
 		if (! loggedInClients.containsKey(newMsg.fromUser())) {
 			return "Warning: you are not logged in. \n";
+=======
+	public void sendMessage(Message newMsg) throws RemoteException{
+		if (! userList.contains(newMsg.fromUser())) {
+			System.out.println("Please create an account before sending a message.");
+			return;
+>>>>>>> RMI
 		}
 		
 		String toUser = newMsg.toUser();
@@ -144,7 +161,10 @@ public class ChatServerImpl implements ChatServer {
 		} else {
 			System.out.printf("No account with user name %s. \n", toUser);
 		}
+<<<<<<< HEAD
 		return "";
+=======
+>>>>>>> RMI
 	}
 	
 	@Override

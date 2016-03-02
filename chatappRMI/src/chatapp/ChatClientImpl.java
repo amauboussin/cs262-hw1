@@ -68,10 +68,25 @@ public class ChatClientImpl implements ChatClient {
 	
 	public void listAccounts(String regexp) throws RemoteException{
 		try{
+<<<<<<< HEAD
 			if(server != null){
 				Set<String> accounts = server.getAccounts(regexp);
 				System.out.printf("Accounts matching input %s: \n", regexp);
 				System.out.printf("%s \n",accounts.toString());
+=======
+			String toMatch = regexp;
+			if (toMatch.equals("")) {
+				toMatch = "(.*)";
+			}
+			if(server != null){
+				Set<String> accounts = server.getAccounts();
+				System.out.printf("Accounts matching input %s: \n", regexp);
+				for (String a : accounts){
+					if (a.matches(toMatch)) {
+						System.out.printf("%s \n",a);
+					}
+				}	
+>>>>>>> RMI
 			}
 		} catch (RemoteException e) {
 			System.out.println("Could not list accounts.");
@@ -93,11 +108,27 @@ public class ChatClientImpl implements ChatClient {
 
 	public void listGroups(String regexp) throws RemoteException{
 		try{
+<<<<<<< HEAD
 			if(server != null){
 				Hashtable<String, Set<String>> groups = server.getGroups(regexp);
 				System.out.printf("Groups matching input %s: \n", regexp);
 				System.out.printf("%s \n", groups.toString());
 				}	
+=======
+			String toMatch = regexp;
+			if (toMatch.equals("")) {
+				toMatch = "(.*)";
+			}
+			if(server != null){
+				Hashtable<String, Set<String>> groups = server.getGroups();
+				System.out.printf("Groups matching input %s: \n", regexp);
+				for (String g : groups.keySet()){
+					if (g.matches(toMatch)) {
+						System.out.printf("Group %s, members: %s \n",g, groups.get(g).toString());
+					}
+				}	
+			}
+>>>>>>> RMI
 		} catch (RemoteException e) {
 			System.out.println("Could not list accounts.");
 			e.printStackTrace();
@@ -108,8 +139,12 @@ public class ChatClientImpl implements ChatClient {
 		try{
 			if(server != null){
 				Message newMsg = new MessageImpl(myID,toUser,msgText,System.currentTimeMillis());
+<<<<<<< HEAD
 				String potentialWarning = server.sendMessage(newMsg);
 				System.out.printf("%s", potentialWarning);
+=======
+				server.sendMessage(newMsg);
+>>>>>>> RMI
 				System.out.println("Message sent.");
 			}
 		} catch (RemoteException e) {
