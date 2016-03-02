@@ -6,8 +6,13 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 public class TestClient2 {
+<<<<<<< HEAD
 	private static String hostname = "10.252.192.83";
 	private static int port = 1358;
+=======
+	private static String hostname = "10.252.195.239";
+	private static int port = 3550;
+>>>>>>> RMI
 	public static void main(String[] args) throws RemoteException {
 		if (args.length > 0) {
 			hostname = args[0];
