@@ -21,7 +21,7 @@ public interface ChatServer extends Remote {
     void login(ChatClient client) 
     		throws RemoteException;
 
-    void logout(String clientID) 
+    void logout(ChatClient client) 
     		throws RemoteException;	
 	
 	Set<String> getAccounts()

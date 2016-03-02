@@ -33,7 +33,6 @@ public class TestClient {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		erik.readMessages();
 		eric.logout();
 		eric.deleteMyAccount();
 		erik.deleteMyAccount();

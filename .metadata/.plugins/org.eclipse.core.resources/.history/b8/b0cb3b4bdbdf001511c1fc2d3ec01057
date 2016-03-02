@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 public class TestClient2 {
-	private static String hostname = "10.252.195.239";
+	private static String hostname = "Erics-MacBook-Pro-2.local";
 	private static int port = 3550;
 	public static void main(String[] args) throws RemoteException {
 		if (args.length > 0) {

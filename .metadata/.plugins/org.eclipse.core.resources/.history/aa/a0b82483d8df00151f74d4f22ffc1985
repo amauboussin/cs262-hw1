@@ -63,7 +63,7 @@ public class ChatClientImpl implements ChatClient {
 	
 	@Override
     public void logout() throws RemoteException {
-		server.logout(myID);
+		server.logout(this);
 	}	
 	
 	public void listAccounts(String regexp) throws RemoteException{

@@ -92,7 +92,7 @@ public class ChatServerImpl implements ChatServer {
 			if (loggedInClients.containsKey(toUser)) {
 				try {
 					loggedInClients.get(toUser).deliverMessage(newMsg);
-				} catch  (RemoteException e) {
+				} catch  (Exception e) {
 					// if toUser is offline but did not logout, logout toUser and add it to its queue
 					logout(toUser);
 					msgQueues.get(toUser).add(newMsg);
@@ -107,7 +107,7 @@ public class ChatServerImpl implements ChatServer {
 					if (loggedInClients.containsKey(m)) {
 						try {
 							loggedInClients.get(m).deliverMessage(newMsg);
-						} catch  (RemoteException e) {
+						} catch  (Exception e) {
 							// if m is offline but did not logout, logout toUser and add it to its queue
 							logout(m);
 							msgQueues.get(m).add(newMsg);
