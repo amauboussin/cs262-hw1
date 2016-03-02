@@ -1,29 +1,25 @@
 package chatapp;
 
-import java.io.Serializable;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
 import java.util.Date;
+import java.util.Hashtable;
 
 public class ChatClientImpl implements ChatClient {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
 	
 	private String serverHost;
 	private String myID;
 	private ChatServer server = null;
 	
-	public ChatClientImpl(String serverHostName, String loginID){
+	public ChatClientImpl(String serverHostName, int port, String loginID){
 		serverHost = serverHostName;
 		myID = loginID;
-		server = getServer(serverHost);
+		server = getServer(serverHost, port);
 		System.out.println("Connected");
 	}
 	
@@ -67,7 +63,7 @@ public class ChatClientImpl implements ChatClient {
 	
 	@Override
     public void logout() throws RemoteException {
-		server.logout(this);
+		server.logout(myID);
 	}	
 	
 	public void listAccounts(String regexp) throws RemoteException{
@@ -110,11 +106,11 @@ public class ChatClientImpl implements ChatClient {
 				toMatch = "(.*)";
 			}
 			if(server != null){
-				Set<String> groups = server.getGroups();
+				Hashtable<String, Set<String>> groups = server.getGroups();
 				System.out.printf("Groups matching input %s: \n", regexp);
-				for (String g : groups){
+				for (String g : groups.keySet()){
 					if (g.matches(toMatch)) {
-						System.out.printf("%s \n",g);
+						System.out.printf("Group %s, members: %s \n",g, groups.get(g).toString());
 					}
 				}	
 			}
@@ -157,12 +153,12 @@ public class ChatClientImpl implements ChatClient {
 		System.out.printf("At %s , user %s said: %s \n",mdate.toString(), msg.fromUser(),msg.msgText());		
 	}
 	
-	private ChatServer getServer(String serverHost) {
+	private ChatServer getServer(String serverHost, int port) {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
 		try {
-			Registry useRegistry = LocateRegistry.getRegistry(serverHost);
+			Registry useRegistry = LocateRegistry.getRegistry(serverHost, port);
 			return ((ChatServer) useRegistry.lookup("chatServer"));
 		} catch (Exception e) {
 			System.out.println("Unable to find chat server");

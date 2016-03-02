@@ -1,23 +1,26 @@
 package chatapp;
 
 import java.rmi.RemoteException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
 
 public class TestClient2 {
-	private static String hostname = "Erics-MacBook-Pro-2.local";
+	private static String hostname = "10.252.195.239";
+	private static int port = 3550;
 	public static void main(String[] args) throws RemoteException {
 		if (args.length > 0) {
 			hostname = args[0];
 		}
-		ChatClient client = new ChatClientImpl(hostname, "Client2");	
+		ChatClient client = new ChatClientImpl(hostname, port, "Alex");	
 		client.createAccount();
 		client.login();
-		client.sendMessage("Client1", "Hi");
-		try {
+		client.sendMessage("Eric", "Hi Eric");
+		/* try {
 			TimeUnit.SECONDS.sleep(20);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-		client.logout();
+		} */
+		return;
 	}	
 } 

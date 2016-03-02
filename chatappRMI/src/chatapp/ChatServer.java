@@ -2,6 +2,7 @@ package chatapp;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.Hashtable;
 import java.util.Set;
 
 /**
@@ -20,16 +21,16 @@ public interface ChatServer extends Remote {
     void login(ChatClient client) 
     		throws RemoteException;
 
-    void logout(ChatClient client) 
+    void logout(String clientID) 
     		throws RemoteException;	
 	
 	Set<String> getAccounts()
 			throws RemoteException;
 	
-	String createGroup(Set<String> members, String groupID)
+	void createGroup(Set<String> members, String groupID)
 			throws RemoteException;
 	
- 	Set<String> getGroups()
+	Hashtable<String, Set<String>> getGroups()
 			throws RemoteException;
 	
 	void sendMessage(Message msg)

@@ -25,9 +25,9 @@ public class ChatServerImpl implements ChatServer {
 		userList = initUserList;
 		groupTable = initGroupTable;
 		msgQueues = initMsgQueues;*/
-	public ChatServerImpl() {
+	public ChatServerImpl(int port) {
 		try {
-			exportServer();
+			exportServer(port);
 		} catch (RemoteException e) {
 			System.out.println(e.getMessage());
 			System.out.println("unable to export chat server");
@@ -41,6 +41,7 @@ public class ChatServerImpl implements ChatServer {
 			return false;
 		}
 		userList.add(newID);
+		msgQueues.put(newID, new HashSet<Message>());
 		System.out.printf("Added new account %s.\n",newID);
 		return true;
 	}
@@ -49,7 +50,6 @@ public class ChatServerImpl implements ChatServer {
 	public void deleteAccount(String userID) throws RemoteException{
 		userList.remove(userID);
 		msgQueues.remove(userID);
-		// also remove from all groups?
 	}
 	
 	@Override
@@ -58,9 +58,9 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	@Override
-    public void logout(ChatClient client) throws RemoteException {
-		if (loggedInClients.containsKey(client.getID())) {
-			loggedInClients.remove(client.getID());
+    public void logout(String clientID) throws RemoteException {
+		if (loggedInClients.containsKey(clientID)) {
+			loggedInClients.remove(clientID);
 		}
 	}
 	
@@ -70,48 +70,51 @@ public class ChatServerImpl implements ChatServer {
 	}
 	
 	@Override
-	public String createGroup(Set<String> members, String groupID) throws RemoteException{
-		groupTable.put(groupID,members); // any point in checking that all members are in userList?
-		return groupID;
+	public void createGroup(Set<String> members, String groupID) throws RemoteException{
+		groupTable.put(groupID,members); 
 	}
 	
  	@Override
-	public Set<String> getGroups() throws RemoteException{
- 		Set<String> groupList = new HashSet<String>();
- 		//  .keySet is backed up by the hash table so 
- 		//  we cannot marshall it
- 		for (String g: groupTable.keySet()) {
- 			groupList.add(g);
- 		}
-		return groupList; 
+	public Hashtable<String, Set<String>> getGroups() throws RemoteException{
+ 		return groupTable; 
 	}
 	
 	
 	@Override
 	public void sendMessage(Message newMsg) throws RemoteException{
+		if (! userList.contains(newMsg.fromUser())) {
+			System.out.println("Please create an account before sending a message.");
+			return;
+		}
+		
 		String toUser = newMsg.toUser();
 		if (userList.contains(toUser)) {
-			if (userList.contains(newMsg.fromUser())) {
-				if (loggedInClients.containsKey(toUser)) {
+			if (loggedInClients.containsKey(toUser)) {
+				try {
 					loggedInClients.get(toUser).deliverMessage(newMsg);
-				} else {
-					Set<Message> Msgs = new HashSet<Message>();
-					if (msgQueues.containsKey(toUser)) { 
-						Msgs = msgQueues.get(toUser);
-					}
-					Msgs.add(newMsg);
-					msgQueues.put(toUser, Msgs);
+				} catch  (RemoteException e) {
+					// if toUser is offline but did not logout, logout toUser and add it to its queue
+					logout(toUser);
+					msgQueues.get(toUser).add(newMsg);
 				}
 			} else {
-				System.out.println("Please create an account before sending a message.");
+				msgQueues.get(toUser).add(newMsg);
 			}
 		} else if (groupTable.containsKey(toUser)) {
 			Set<String> members = groupTable.get(toUser);
 			for (String m : members){
 				if (userList.contains(m)) {
-					Set<Message> Msgs = msgQueues.get(m);
-					Msgs.add(newMsg);
-					msgQueues.put(m, Msgs);
+					if (loggedInClients.containsKey(m)) {
+						try {
+							loggedInClients.get(m).deliverMessage(newMsg);
+						} catch  (RemoteException e) {
+							// if m is offline but did not logout, logout toUser and add it to its queue
+							logout(m);
+							msgQueues.get(m).add(newMsg);
+						}
+					} else {
+						msgQueues.get(m).add(newMsg);
+					}
 				} 
 			}
 		} else {
@@ -122,7 +125,7 @@ public class ChatServerImpl implements ChatServer {
 	@Override
 	public Set<Message> deliverMessages(String toUser) throws RemoteException{
 		Set<Message> msgs = msgQueues.get(toUser);
-		msgQueues.remove(toUser);
+		msgQueues.put(toUser, new HashSet<Message>());
 		return msgs;
 	}
 	
@@ -138,12 +141,12 @@ public class ChatServerImpl implements ChatServer {
 		}
 	}
 	
-	private void exportServer() throws RemoteException {
+	private void exportServer(int port) throws RemoteException {
 		if(System.getSecurityManager() == null){
 			System.setSecurityManager(new SecurityManager());
 		}
-		registry = LocateRegistry.getRegistry();
-		myStub = (ChatServer) UnicastRemoteObject.exportObject(this,0);
+		registry = LocateRegistry.createRegistry(port);
+		myStub = (ChatServer) UnicastRemoteObject.exportObject(this,port);
 		registry.rebind("chatServer",myStub);
 	}
 }
