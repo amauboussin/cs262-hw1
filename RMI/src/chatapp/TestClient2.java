@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestClient2 {
 	/**
-     	 * hardcoded IP address the client will attempt to use
+     	 * hardcoded IP address of the server the client will connect to
      	 */
 	private static String hostname = "10.252.192.83";
-	
+		
 	/**
-     	 * hardcoded port the client will attempt to use
+     	 * hardcoded port on the server the client will connect to
      	 */
 	private static int port = 1358;
 	
