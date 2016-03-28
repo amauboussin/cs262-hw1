@@ -2,6 +2,9 @@ package chatapp;
 
 import java.io.Serializable;
 
+/**
+ * Implements the Serializable Message class
+ */
 public class MessageImpl implements Message, Serializable {
 	/**
 	 * version number, because Message is Serializable
