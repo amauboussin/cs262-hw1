@@ -146,6 +146,7 @@ public interface ChatServer extends Remote {
      * for each member.
      * 
      * @param msg a {@link Message} object to be sent
+     * @return a warning if logged off, else an empty string
      */	
     String sendMessage(Message msg)
 	throws RemoteException;
