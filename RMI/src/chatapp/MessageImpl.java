@@ -3,7 +3,7 @@ package chatapp;
 import java.io.Serializable;
 
 /**
- * Implements the Serializable Message class
+ * Implements the Serializable (@link Message} class
  */
 public class MessageImpl implements Message, Serializable {
 	/**
