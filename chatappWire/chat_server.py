@@ -10,9 +10,8 @@ import re
 # makes common patters shorter and easier
 from utils import *
 
+# global variables holding: port #, socket list, account list, group list, user socket and list of queued messages
 PORT = 5000
-
-
 all_sockets = []
 accounts = set()
 groups = {}
@@ -25,6 +24,12 @@ def log(message):
 
 
 def login(requester, username):
+    """Login the user on the given socket
+
+    Args:
+        requester(socket.socket): Socket of user to be logged in
+        username (string): username
+    """
     if username not in accounts:
         return 'Account %s does not exist' % username
     socket_username[requester] = username
@@ -54,6 +59,13 @@ def create_account(requester, name):
 
 
 def create_group(requester, name, *members):
+    """Login the user on the given socket
+
+    Args:
+        requester(socket.socket): Socket of user
+        name (string): group name
+        *members(array); list of usernames to add to group
+    """
     return_message = ''
     if not name in groups:
         groups[name] = []
