@@ -1,7 +1,13 @@
+# package that allows implementation of TCP/IP sockets
 import socket
+
+# implementation of the Unix select() system call; used to get a list of sockets sending data 
 import select
+
+# module providing regular expression; used for message formatting
 import re
 
+# makes common patters shorter and easier
 from utils import *
 
 PORT = 5000
