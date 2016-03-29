@@ -36,6 +36,7 @@ def prompt():
     sys.stdout.flush()
 
 if __name__ == "__main__":
+    """Setup and listener for the client"""
 
     if (len(sys.argv) < 4):
         print 'Incorrect syntax: python chat_client.py hostname port username'
@@ -58,6 +59,7 @@ if __name__ == "__main__":
     send_to_server(client_socket, 'login %s' % username)
     print 'Welcome ' + username + '.  Type "help" for help.'
 
+    #  send a logout message to the server if the program exits for any reason
     @atexit.register
     def logout():
         send_to_server(client_socket, 'logout')
@@ -68,7 +70,7 @@ if __name__ == "__main__":
 
         read_sockets, _, _ = select.select(sock_list, [], [])
         for s in read_sockets:
-            if s == client_socket:
+            if s == client_socket:  # data from server, parse and display
                 data = s.recv(HEADER_SIZE)
                 if data:
                     server_version, payload_size = parse_header(data)
@@ -81,7 +83,7 @@ if __name__ == "__main__":
                     print 'Server disconnected'
                     sys.exit()
 
-            else:  # data from stdin
+            else:  # data from stdin, send to server if it is not a request for help
                 message = sys.stdin.readline()
                 if message.startswith('help'):
                     print get_help()

@@ -1,22 +1,18 @@
 # package that allows implementation of TCP/IP sockets
 import socket
 
-# implementation of the Unix select() system call; used to get a list of sockets sending data 
+# implementation of the Unix select() system call; used to get a list of sockets sending data
 import select
 
 # module providing regular expression; used for message formatting
 import re
 
-# makes common patters shorter and easier
+# Wire protocol encoding and parsing
 from utils import *
 
-# global variables holding: port #, socket list, account list, group list, user socket and list of queued messages
 PORT = 5000
-<<<<<<< HEAD
 
 #  List of all open sockets
-=======
->>>>>>> 41b809ee2dde7667b0834e9046407dc548ed317d
 all_sockets = []
 
 #  Set of all account names
@@ -40,7 +36,6 @@ def log(message):
 
 
 def login(requester, username):
-<<<<<<< HEAD
     """
     Login with the given username and send any messages queued while the user was offline
     Args:
@@ -48,13 +43,6 @@ def login(requester, username):
         username(str): Username of account to log in on
     Returns:
         String describing the result of the login attempt
-=======
-    """Login the user on the given socket
-
-    Args:
-        requester(socket.socket): Socket of user to be logged in
-        username (string): username
->>>>>>> 41b809ee2dde7667b0834e9046407dc548ed317d
     """
     if username not in accounts:
         return 'Account %s does not exist' % username
