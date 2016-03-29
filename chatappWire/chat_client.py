@@ -1,13 +1,25 @@
+# implements clenup functions; used to logout from server upon client script termination
 import atexit
+# package that allows implementation of TCP/IP sockets
 import socket
+# implementation of the Unix select() system call; used to get a list of sockets sending data
 import select
+# implements command line arguments; used to start client with parameters
 import sys
-import string
 
+# Wire protocol encoding and parsing
 from utils import *
 
+
 def send_to_server(client_socket, command):
-    '''Send the given message to the given recipient'''
+    """Send the given message to the given recipient
+
+    Args:
+        client_socket (socket.socket): socket of the message receiver
+        command (str): message contents
+
+    No return value. Prints error message if can not connect to server.
+    """
     header, request = serialize_request(command)
 
     if header and request:
@@ -17,7 +29,9 @@ def send_to_server(client_socket, command):
         except socket.error:
             print 'Server disconnected'
 
+
 def prompt():
+    """ Prints out ">>" to make the prompt look nice """
     sys.stdout.write('>> ')
     sys.stdout.flush()
 
@@ -47,13 +61,12 @@ if __name__ == "__main__":
     @atexit.register
     def logout():
         send_to_server(client_socket, 'logout')
-    
+
     while True:
 
         sock_list = [sys.stdin, client_socket]
 
         read_sockets, _, _ = select.select(sock_list, [], [])
-        
         for s in read_sockets:
             if s == client_socket:
                 data = s.recv(HEADER_SIZE)
@@ -68,13 +81,10 @@ if __name__ == "__main__":
                     print 'Server disconnected'
                     sys.exit()
 
-            else: #  data from stdin
+            else:  # data from stdin
                 message = sys.stdin.readline()
                 if message.startswith('help'):
                     print get_help()
                 else:
                     send_to_server(client_socket, message)
                 prompt()
-
-                
-
