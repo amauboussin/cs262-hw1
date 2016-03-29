@@ -6,19 +6,38 @@ from utils import *
 
 PORT = 5000
 
-
+#  List of all open sockets
 all_sockets = []
+
+#  Set of all account names
 accounts = set()
+
+#  {group name: [group members]}
 groups = {}
+
+#  {socket: username}
 socket_username = {}
+
+#  username: queued messages
 queued_messages = {}
 
 
 def log(message):
+    """
+    Log a message. Currently uses stdout but could use a file or other logging system
+    """
     print message
 
 
 def login(requester, username):
+    """
+    Login with the given username and send any messages queued while the user was offline
+    Args:
+        requester(socket.socket): Socket of user to be logged in
+        username(str): Username of account to log in on
+    Returns:
+        String describing the result of the login attempt
+    """
     if username not in accounts:
         return 'Account %s does not exist' % username
     socket_username[requester] = username
@@ -30,7 +49,8 @@ def login(requester, username):
 
 
 def logout(requester):
-    """Logout the user on the given socket
+    """
+    Logout the user on the given socket
 
     Args:
         requester(socket.socket): Socket of user to be logged out
@@ -39,7 +59,15 @@ def logout(requester):
 
 
 def create_account(requester, name):
-    '''Create an account with the given name and login'''
+    """
+    Create an account with the given name and log them in on the requester socket
+
+    Args:
+        requester(socket.socket): Socket to be associated with the new account
+        name(str): Username of the new account
+    Returns:
+        String confirming the account creation or describing its failure
+    """
     if not name in accounts:
         accounts.add(name)
         queued_messages[name] = []
@@ -62,7 +90,8 @@ def create_group(requester, name, *members):
 
 
 def message(requester, user, message, from_queue=False):
-    """Send a message to a user if they are online
+    """
+    Send a message to a user if they are online, otherwise adds it to the queue
 
     Args:
         requester(socket.socket): Read socket of the account sending the message
@@ -98,7 +127,8 @@ def message_group(requester, group, to_send):
 
 
 def _filter_names(names, query):
-    """Filter a list of names by the given wildcard query
+    """
+    Filter a list of names by the given wildcard query
     Args:
         names (str list): list of names to be filtered
         query(str): string that each name must contain
@@ -108,7 +138,8 @@ def _filter_names(names, query):
 
 
 def list_groups(requester, query='*'):
-    """List all groups that match the given query
+    """
+    List all groups that match the given query
     Args:
         requester(socket.socket): Socket to send confirmation message to
         query(str): Optional, string that group names must contain
@@ -130,7 +161,8 @@ def list_accounts(requester, query='*'):
 
 
 def delete_account(requester, to_delete):
-    """Delete a user account
+    """
+    Delete a user account
 
     Args:
         requester(socket.socket): Socket to send confirmation message to
@@ -147,7 +179,8 @@ def delete_account(requester, to_delete):
 
 
 def send(socket, message):
-    """Send a given message over a socket (complete with a header)
+    """
+    Send a given message over a socket (complete with a header)
     Args:
         socket(socket.socket): socket to send the message over
         message (str): message to be sent
@@ -194,7 +227,8 @@ commands = {c: get_command(c) for c in commands}
 
 
 def parse_client_message(requester, message):
-    """Parse a request from a client and return a response
+    """
+    Parse a request from a client and return a response
 
     Args:
         requester (socket.socket): socket of the message sender
