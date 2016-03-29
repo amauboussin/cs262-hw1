@@ -12,7 +12,8 @@ from utils import *
 
 
 def send_to_server(client_socket, command):
-    """Send the given message to the given recipient
+    """
+    Send the given message to the given recipient
 
     Args:
         client_socket (socket.socket): socket of the message receiver
@@ -31,7 +32,7 @@ def send_to_server(client_socket, command):
 
 
 def prompt():
-    """ Prints out ">>" to make the prompt look nice """
+    """Prints out ">>" to make the prompt look nice """
     sys.stdout.write('>> ')
     sys.stdout.flush()
 

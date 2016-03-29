@@ -82,7 +82,8 @@ def create_account(requester, name):
 
 
 def create_group(requester, name, *members):
-    """Login the user on the given socket
+    """
+    Login the user on the given socket
 
     Args:
         requester(socket.socket): Socket of user
@@ -221,7 +222,8 @@ def handle_disconnect(socket):
 
 
 def get_command(command):
-    """Try to load the given command from the global namespace
+    """
+    Try to load the given command from the global namespace
 
     Args:
         command(str): Name of the command to try to load
