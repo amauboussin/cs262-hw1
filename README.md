@@ -10,7 +10,7 @@ The server will run on port 5000 by default, this option can be changed by modif
 Run the client using `python chat_client.py hostname port username`
 where hostname and port specify the connection settings and username specifies which account to login as. If no account with the given username exists, it will be automatically created. Once in the client, type help to see a list of commands. 
 
-####Implmentation details
+####Implementation details
 The protocol consisted of two packets per messages, both sent over the wire as
 strings. First, a header packet that contains a version number and the size of the
 payload packet. Next, a payload packet that contains a string denoting which command
