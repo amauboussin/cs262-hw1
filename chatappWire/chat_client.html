@@ -1,0 +1,52 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module chat_client</title>
+<meta charset="utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>chat_client</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/Users/amauboussin/Desktop/cs/cs262-hw1/chatappWire/chat_client.py">/Users/amauboussin/Desktop/cs/cs262-hw1/chatappWire/chat_client.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;implements&nbsp;clenup&nbsp;functions;&nbsp;used&nbsp;to&nbsp;logout&nbsp;from&nbsp;server&nbsp;upon&nbsp;client&nbsp;script&nbsp;termination</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="atexit.html">atexit</a><br>
+</td><td width="25%" valign=top><a href="select.html">select</a><br>
+</td><td width="25%" valign=top><a href="socket.html">socket</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-prompt"><strong>prompt</strong></a>()</dt><dd><tt>Prints&nbsp;out&nbsp;"&gt;&gt;"&nbsp;to&nbsp;make&nbsp;the&nbsp;prompt&nbsp;look&nbsp;nice</tt></dd></dl>
+ <dl><dt><a name="-send_to_server"><strong>send_to_server</strong></a>(client_socket, command)</dt><dd><tt>Send&nbsp;the&nbsp;given&nbsp;message&nbsp;to&nbsp;the&nbsp;given&nbsp;recipient<br>
+&nbsp;<br>
+Args:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;client_socket&nbsp;(socket.socket):&nbsp;socket&nbsp;of&nbsp;the&nbsp;message&nbsp;receiver<br>
+&nbsp;&nbsp;&nbsp;&nbsp;command&nbsp;(str):&nbsp;message&nbsp;contents<br>
+&nbsp;<br>
+No&nbsp;return&nbsp;value.&nbsp;Prints&nbsp;error&nbsp;message&nbsp;if&nbsp;can&nbsp;not&nbsp;connect&nbsp;to&nbsp;server.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>HEADER_SIZE</strong> = 16<br>
+<strong>MAX_CLIENTS</strong> = 10<br>
+<strong>VERSION</strong> = '1.00'<br>
+<strong>command_args</strong> = {'create_account': 'username', 'create_group': 'group_name', 'delete_account': 'username', 'list_accounts': 'query(optional)', 'list_groups': 'query(optional)', 'login': 'username', 'logout': 'No Arguments', 'message': 'username message', 'message_group': 'group_name message'}<br>
+<strong>commands</strong> = ['list_accounts', 'logout', 'message_group', 'list_groups', 'create_group', 'login', 'message', 'create_account', 'delete_account']</td></tr></table>
+</body></html>
