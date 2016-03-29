@@ -1,13 +1,26 @@
+# implements clenup functions; used to logout from server upon client script termination
 import atexit
+# package that allows implementation of TCP/IP sockets
 import socket
+# implementation of the Unix select() system call; used to get a list of sockets sending data 
 import select
+# implements command line arguments; used to start client with parameters
 import sys
+# implements functions on string; used for processing user commands
 import string
 
+# makes common patters shorter and easier
 from utils import *
 
 def send_to_server(client_socket, command):
-    '''Send the given message to the given recipient'''
+    """Send the given message to the given recipient
+
+    Args:
+        client_socket (socket.socket): socket of the message receiver
+        command (str): message contents
+
+    No return value. Prints error message if can not connect to server.
+    """
     header, request = serialize_request(command)
 
     if header and request:
@@ -18,6 +31,7 @@ def send_to_server(client_socket, command):
             print 'Server disconnected'
 
 def prompt():
+    """ Prints out ">>" to make the prompt look nice """
     sys.stdout.write('>> ')
     sys.stdout.flush()
 
