@@ -1,4 +1,6 @@
-# implements clenup functions; used to logout from server upon client script termination
+'''chat_client.py implements functionality allowing users to connect to a server, login, and send it commands.'''
+
+# implements cleanup functions; used to logout from server upon client script termination
 import atexit
 # package that allows implementation of TCP/IP sockets
 import socket
@@ -13,7 +15,10 @@ from utils import *
 
 def send_to_server(client_socket, command):
     """
-    Send the given message to the given recipient
+    Send the given message to the given recipient.  Serialization breaks the command message into two parts.
+    The first part is a header specifying only the version number of the protocol used to confirm compatability, as well as the size of the rest of the message.
+    The body of the request follows of size specified in the header so that the server knows how much to expect.
+    See utils module docs for information on wire protocol serialization.
 
     Args:
         client_socket (socket.socket): socket of the message receiver
@@ -32,12 +37,22 @@ def send_to_server(client_socket, command):
 
 
 def prompt():
-    """Prints out ">>" to make the prompt look nice """
+    """
+    Prints out ">>" to make the prompt look nice.
+    """
     sys.stdout.write('>> ')
     sys.stdout.flush()
 
 if __name__ == "__main__":
-    """Setup and listener for the client"""
+    """
+    Setup and listener for the client.  First establish a socket based on startup args, and then attempt to connect to server.
+    Once connected, utilize select() function to block simultaneously on stdin and the socket.  If message is received from the server over the socket, print it.  If command is read from stdin, send it to the server over socket.
+    
+    Args (recv from command line):
+        argv[1] (string): hostname of server
+        argv[2] (int): port to connect over
+        argv[3] (string): username to connect to server with
+    """
 
     if (len(sys.argv) < 4):
         print 'Incorrect syntax: python chat_client.py hostname port username'

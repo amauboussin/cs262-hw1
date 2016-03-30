@@ -1,3 +1,4 @@
+'''utils.py implements important functionality shared between the chat_server and chat_client, namely that having to do with the custom wire protocol, serialization, and message processing.'''
 
 VERSION = '1.00'
 HEADER_SIZE = 16
@@ -20,7 +21,9 @@ commands = command_args.keys()
 
 
 def get_help():
-    """Return a string with a list of all available commands and their arguments"""
+    """
+    Return a string with a list of all available commands and their arguments
+    """
     s = 'Function: Arguments\n'
     for f, args in command_args.items():
         s += '%s: %s\n' % (f, args)
@@ -28,7 +31,15 @@ def get_help():
 
 
 def parse_body(message):
-    """Return the function being requested and its arguments given a message string"""
+    """
+    Takes a given message string from the body of a request and deserializes it by parsing the custom wire protocol and extracting the message components, namely the function being requested and its arguments.
+    See serializer for information on wire protocol serialization format parsed here.
+
+    Args:
+        message (string): the serialized message body to parse
+    Returns:
+        The deserialized command and arguments extracted from the message.
+    """
     pieces = map(lambda s: s.strip(), message.split('|'))
     command = pieces[0].strip()
     args = pieces[1:] if len(pieces) > 1 else ()
@@ -36,14 +47,22 @@ def parse_body(message):
 
 
 def parse_header(header):
-    """Return the wire protocol version and payload size given a header string"""
+    """
+    Return the wire protocol version and payload size given a header string.
+
+    Args:
+        header (string): the message header to parse
+    Returns:
+        The version number and size of the payload to follow extracted from the message header.
+    """
     version, payload_size = header.split('|')
     payload_size = int(float(payload_size))
     return version, payload_size
 
 
 def serialize_header(payload_size):
-    """Create the header for a request
+    """
+    Create the header for a request in the format of the custom wire protocol.  The protocol for the header separates header components with pipes "|" to parse between in deserialization.
 
     Args:
         payload_size (int): Payload size of the request in characters
@@ -56,7 +75,10 @@ def serialize_header(payload_size):
 
 
 def serialize_request(command):
-    """Create a request from a string command using the custom wire protocol
+    """
+    Create a request from a string command using the custom wire protocol.  
+    First decompose the input string into the command and arguments, and then compose message body by separating components on the wire with pipes "|" for deserializer to parse between.
+    To this end, pipes are not permitted in input strings and will be rejected. 
 
     Args:
         command (str): A space-delimitedstring with the name of the function
