@@ -8,14 +8,34 @@ import java.util.Set;
 import java.util.Date;
 import java.util.Hashtable;
 
+/**
+ * Implements the {@link ChatClient} class
+ */
 public class ChatClientImpl implements ChatClient {
 	
-
-	
+	/**
+	 * the IP address of the ChatServer to connect to
+	 */
 	private String serverHost;
+	
+	/**
+	 * the username associates with this client
+	 */
 	private String myID;
+
+	/**
+	 * the stub of the connected ChatServer
+	 */
 	private ChatServer server = null;
 	
+	/**
+	 * Creates a chat client, connects to server with call to
+	 * {@link #getServer(String serverHostName, int port)}.
+	 * 
+	 * @param serverHostName IP address of server, as string
+	 * @param port           port of server
+	 * @param loginID        username for client
+	 */
 	public ChatClientImpl(String serverHostName, int port, String loginID){
 		serverHost = serverHostName;
 		myID = loginID;
@@ -23,10 +43,12 @@ public class ChatClientImpl implements ChatClient {
 		System.out.println("Connected");
 	}
 	
+	@Override
 	public String getID() throws RemoteException{
 		return myID;
 	}
 	
+	@Override
 	public void createAccount() throws RemoteException{
 		try{
 			if(server != null){
@@ -42,7 +64,7 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 	
-	
+	@Override
 	public void deleteMyAccount() throws RemoteException{
 		try{
 			if(server != null){
@@ -56,16 +78,17 @@ public class ChatClientImpl implements ChatClient {
 	}
 
 	@Override
-    public void login() throws RemoteException {
+        public void login() throws RemoteException {
 	    ChatClient client = (ChatClient) UnicastRemoteObject.exportObject(this,0);
 		server.login(client);
 	}
 	
 	@Override
-    public void logout() throws RemoteException {
+        public void logout() throws RemoteException {
 		server.logout(myID);
 	}	
 	
+	@Override
 	public void listAccounts(String regexp) throws RemoteException{
 		try{
 			if(server != null){
@@ -78,7 +101,8 @@ public class ChatClientImpl implements ChatClient {
 			e.printStackTrace();
 		}
 	}
-
+	
+	@Override
 	public void createGroup(Set<String> members, String groupID)throws RemoteException{
 		try{
 			if(server != null){
@@ -91,6 +115,7 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 
+	@Override
 	public void listGroups(String regexp) throws RemoteException{
 		try{
 			if(server != null){
@@ -104,6 +129,7 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 	
+	@Override
 	public void sendMessage(String toUser, String msgText) throws RemoteException{
 		try{
 			if(server != null){
@@ -118,6 +144,7 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 	
+	@Override
 	public void readMessages() throws RemoteException{
 		try{
 			if(server != null){
@@ -133,11 +160,22 @@ public class ChatClientImpl implements ChatClient {
 		}
 	}
 	
+	@Override
 	public void deliverMessage(Message msg) throws RemoteException{
 		Date mdate = new Date(msg.msgTime());
 		System.out.printf("At %s , user %s said: %s \n",mdate.toString(), msg.fromUser(),msg.msgText());		
 	}
 	
+	/**
+	 * Connect with server, performed once on initalization rather 
+	 * than once per method call for efficiency
+	 * 
+	 * @param serverHost IP address of chat server, as string
+	 * @param port       port of chat server
+	 * @return           stub of connected server, stored in 
+	 *                   private field on initialization for 
+	 *                   remote calls in other methods
+	 */
 	private ChatServer getServer(String serverHost, int port) {
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
