@@ -10,21 +10,48 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Hashtable;
 
+/**
+ * Implements the {@link ChatServer} class
+ */
 public class ChatServerImpl implements ChatServer {
 	
+	/** 
+	 * a list of usernames for which an account had been created and not deleted
+	 */
 	private Set<String> userList = new HashSet<String>();
+	
+	/** 
+	 * a table of groups for which an account had been created and not deleted.
+	 * a group has a name and is a set of usernames.
+	 */
 	private Hashtable<String, Set<String>> groupTable = new Hashtable<String, Set<String>>();
+	
+	/** 
+	 * a set of undelivered messages for each logged-off recipient user
+	 */
 	private Hashtable<String, Set<Message>> msgQueues = new Hashtable<String, Set<Message>>();
+	
+	/** 
+	 * the registry by which clients can find this server
+	 */
 	private Registry registry;
+	
+	/** 
+	 * the server stub, which is exported to clients so that they can
+	 * call methods on this server
+	 */
 	private ChatServer myStub;
-	// to send a message to a logged in client
+	
+	/**
+	 * a table of logged-in client stubs, allowing the server to immediately deliver messages
+	 */
 	private Hashtable<String, ChatClient> loggedInClients = new Hashtable<String, ChatClient>();
 	
-	/*public ChatServerImpl(Set<String> initUserList, Hashtable<String, Set<String>> initGroupTable,
-			Hashtable<String, Set<Message>> initMsgQueues){
-		userList = initUserList;
-		groupTable = initGroupTable;
-		msgQueues = initMsgQueues;*/
+	/**
+	 * Creates and exports a ChatServer by calling {@link #exportServer(port)}
+	 * 
+	 * @param port port on which server is exported
+	 */
 	public ChatServerImpl(int port) {
 		try {
 			exportServer(port);
@@ -166,6 +193,11 @@ public class ChatServerImpl implements ChatServer {
 		}
 	}
 	
+	/**
+	 * Makes server available for RMI calls
+	 * 
+	 * @param port port on which server is exported
+	 */
 	private void exportServer(int port) throws RemoteException {
 		if(System.getSecurityManager() == null){
 			System.setSecurityManager(new SecurityManager());
